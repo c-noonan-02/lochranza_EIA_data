@@ -245,3 +245,50 @@ all_bat_data$X <- as.character(all_bat_data$X)
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/1. Field Course/audiomoth_bats")
 all_bat_data <- apply(all_bat_data, 2, as.character)
 write.csv(all_bat_data, "./Results/audiomoth_data_combined.csv", row.names = T)
+
+
+
+# Take current state of data and condense so that only relevant information is
+# left to be used in our database.
+
+rm(list=ls())
+
+getwd()
+setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/1. Field Course/audiomoth_bats/Results")
+getwd()
+list.files()
+
+library(tidyverse)
+
+# import data set from files - edited version re-uploaded from shared excel sheet
+
+# remove unnecessary columns from the dataset
+bat_data2 <- subset(bat_data1, select = -c(file_name, event_time, audiomoth_ID, detection_prob, start_time, end_time, high_freq, low_freq, class_prob))
+bat_data2
+
+# select columns we want to include in the final dataset, group by scientific
+# name and then count the number of recordings / occurences
+bat_data3 <- bat_data2 %>%
+  group_by(site, event_ID, scientific_name) %>%
+  summarise(individual_count = n(), .groups = 'drop')
+
+# add further taxonomy information as needed
+bat_data2$kingdom <- list("Animalia")
+bat_data2$phylum <- list("Chordata")
+bat_data2$class <- list("Mammalia")
+bat_data2$kingdom <- as.character(bat_data2$kingdom)
+bat_data2$phylum <- as.character(bat_data2$phylum)
+bat_data2$class <- as.character(bat_data2$class)
+
+# repeat previous step, but this time including the new taxonomic information
+bat_data3 <- bat_data2 %>%
+  group_by(event_ID, site, scientific_name, habitat_type, sampling_protocol, sampling_effort, sample_size, event_date, start_day_of_year, country, country_code, locality, decimal_lattitude, decimal_longitude, geodetic_datum, kingdom, phylum, class, order, family, genus, species) %>%
+  summarise(individual_count = n(), .groups = 'drop')
+
+# remove the scientific name column from the dataframe
+bat_data4 <- subset(bat_data3, select = -c(scientific_name))
+bat_data4
+
+# save the file again, renaming in order to keep track
+setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/1. Field Course/audiomoth_bats/Results")
+write.csv(bat_data4, "audiomoth_data_concise.csv", row.names = T)

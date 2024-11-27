@@ -508,15 +508,3 @@ ggplot(all_diversity_long, aes(x = Index, y = Diversity)) +
   scale_colour_manual(values = c("purple", "purple4"), labels = c("Slope A", "Slope B")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-ggplot(all_diversity_long, aes(x = Slope, y = Diversity)) +
-  geom_point(aes(colour = Index), na.rm = T, size = 3, alpha = 0.8) +
-  facet_wrap(~sample, ncol = 5, nrow = 1) +
-  labs(x = "Proposed Site", y = "Diversity", colour = "Diversity Index") +
-  scale_x_discrete(labels = c("Slope A", "Slope B"))+
-  scale_colour_manual(values = c("thistle2", "thistle"), labels = c("Shannon's", "Simpson's")) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-
-
-# stuff
-#select(-genre, -spotify_monthly_listeners, -year_founded)

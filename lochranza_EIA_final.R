@@ -7,6 +7,7 @@ library(dplyr)
 library(vegan)
 library(tidyr)
 library(tibble)
+library(cowplot)
 # ...
 
 # import full data set
@@ -46,6 +47,11 @@ invert_data <- invert_data %>%
 invert_abundances <- invert_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# add zeros for orders not present on one slope but present on another
+invert_abundances <- invert_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
+
+
 
 # plot abundances of each invertebrate order
 ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
@@ -62,7 +68,6 @@ ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 # still need to adjust text size?
 # change Key labels and heading
-# add zeros?
 # spread out bars?
 
 # calculate alpha diversity (here number of unique orders) for each site
@@ -82,8 +87,11 @@ invert_sweep_data <- invert_sweep_data %>%
 invert_sweep_abundances <- invert_sweep_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# add zeros for orders not present on one slope but present on another
+invert_sweep_abundances <- invert_sweep_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
 # plot this data
-ggplot(invert_sweep_abundances, aes(x = order, y = total_count, fill = site)) +
+invert_sweep_abundances_plot <- ggplot(invert_sweep_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
     aes(label = total_count),
@@ -91,7 +99,7 @@ ggplot(invert_sweep_abundances, aes(x = order, y = total_count, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Order", y = "Order Abundance", title = "Sweep Netting Invertebrate Sampling") +
+  labs(x = "Order", y = "Order Abundance", title = "Terrestrial Sweep Netting") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -109,8 +117,11 @@ invert_moth_data <- invert_moth_data %>%
 invert_moth_abundances <- invert_moth_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# add zeros for orders not present on one slope but present on another
+invert_moth_abundances <- invert_moth_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
 # plot this data
-ggplot(invert_moth_abundances, aes(x = order, y = total_count, fill = site)) +
+invert_moth_abundances_plot <- ggplot(invert_moth_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
     aes(label = total_count),
@@ -118,7 +129,7 @@ ggplot(invert_moth_abundances, aes(x = order, y = total_count, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Order", y = "Order Abundance", title = "Moth Trap Invertebrate Sampling") +
+  labs(x = "Order", y = "Order Abundance", title = "Moth Trap Sampling") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -136,8 +147,11 @@ invert_stream_data <- invert_stream_data %>%
 invert_stream_abundances <- invert_stream_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# add zeros for orders not present on one slope but present on another
+invert_stream_abundances <- invert_stream_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
 # plot this data
-ggplot(invert_stream_abundances, aes(x = order, y = total_count, fill = site)) +
+invert_stream_abundances_plot <- ggplot(invert_stream_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
     aes(label = total_count),
@@ -145,7 +159,7 @@ ggplot(invert_stream_abundances, aes(x = order, y = total_count, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Order", y = "Order Abundance", title = "Stream Kick Sampling Invertebrate Sampling") +
+  labs(x = "Order", y = "Order Abundance", title = "Stream Kick Sampling") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
@@ -163,16 +177,20 @@ invert_bog_data <- invert_bog_data %>%
 invert_bog_abundances <- invert_bog_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# add zeros for orders not present on one slope but present on another
+invert_bog_abundances <- invert_bog_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
 # plot this data
-ggplot(invert_bog_abundances, aes(x = order, y = total_count)) +
-  geom_bar(stat = "identity", position = "dodge", colour = "black", fill = "purple") +
+invert_bog_abundances_plot <- ggplot(invert_bog_abundances, aes(x = order, y = total_count, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
     aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Order", y = "Order Abundance", title = "Bog Invertebrate Sampling") +
+  labs(x = "Order", y = "Order Abundance", title = "Bog Sampling") +
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 # calculate alpha diversity ( number of unique orders) for each site
@@ -180,6 +198,9 @@ invert_bog_div <- invert_bog_data %>%
   group_by(site) %>% # Group by site
   summarise(no_orders = n_distinct(order), .groups = "drop") # Count unique species
 
+# combine all invert habitat order abundances
+# call relevant plots, in panel display
+plot_grid(invert_sweep_abundances_plot, invert_moth_abundances_plot, invert_stream_abundances_plot, invert_bog_abundances_plot, labels = "AUTO")
 
 # combine all invert habitat order diversities
 invert_sweep_div$sample <- c("Terrestrial Sweep Netting")

@@ -52,7 +52,7 @@ invert_abundances <- invert_abundances %>%
   complete(order, site, fill = list(total_count = 0))
 
 # plot abundances of each invertebrate order
-ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
+invert_order_abundance_plot1 <- ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0,85) +
   geom_text(
@@ -64,10 +64,9 @@ ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
   labs(x = "Order", y = "Order Abundance") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# still need to adjust text size?
-# change Key labels and heading
-# spread out bars?
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 20))
+
 
 # calculate alpha diversity (here number of unique orders) for each site
 invert_alpha_div <- invert_data %>%
@@ -102,7 +101,8 @@ invert_sweep_abundances_plot <- ggplot(invert_sweep_abundances, aes(x = order, y
   labs(x = "Order", y = "Order Abundance", title = "Terrestrial Sweep Netting") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
 # calculate alpha diversity ( number of unique orders) for each site
 invert_sweep_div <- invert_sweep_data %>%
   group_by(site) %>% # Group by site
@@ -133,7 +133,8 @@ invert_moth_abundances_plot <- ggplot(invert_moth_abundances, aes(x = order, y =
   labs(x = "Order", y = "Order Abundance", title = "Moth Trap Sampling") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
 # calculate alpha diversity ( number of unique orders) for each site
 invert_moth_div <- invert_moth_data %>%
   group_by(site) %>% # Group by site
@@ -164,7 +165,8 @@ invert_stream_abundances_plot <- ggplot(invert_stream_abundances, aes(x = order,
   labs(x = "Order", y = "Order Abundance", title = "Stream Kick Sampling") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
 # calculate alpha diversity ( number of unique orders) for each site
 invert_stream_div <- invert_stream_data %>%
   group_by(site) %>% # Group by site
@@ -195,7 +197,8 @@ invert_bog_abundances_plot <- ggplot(invert_bog_abundances, aes(x = order, y = t
   labs(x = "Order", y = "Order Abundance", title = "Bog Sampling") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
 # calculate alpha diversity ( number of unique orders) for each site
 invert_bog_div <- invert_bog_data %>%
   group_by(site) %>% # Group by site
@@ -203,7 +206,7 @@ invert_bog_div <- invert_bog_data %>%
 
 # combine all invert habitat order abundances
 # call relevant plots, in panel display
-plot_grid(invert_sweep_abundances_plot, invert_moth_abundances_plot, invert_stream_abundances_plot, invert_bog_abundances_plot, labels = "AUTO")
+invert_order_abundance_plot2 <- plot_grid(invert_sweep_abundances_plot, invert_moth_abundances_plot, invert_stream_abundances_plot, invert_bog_abundances_plot, labels = "AUTO")
 
 # combine all invert habitat order diversities
 invert_sweep_div$sample <- c("Terrestrial Sweep Netting")
@@ -215,7 +218,7 @@ invert_bog_div$sample <- c("Bog Sampling")
 invert_alpha_div$sample <- c("Total Slope Sample")
 invert_sample_div <- rbind(invert_sweep_div, invert_moth_div, invert_stream_div, invert_bog_div, invert_alpha_div)
 # plot invert div data
-ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
+invert_order_richness_plot <- ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0, 18) +
   geom_text(
@@ -224,10 +227,12 @@ ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Sampling Method", y = "Number of invertebrate orders") + 
+  labs(x = "Sampling Method", y = "Order Richness") + 
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"), axis.text.x = element_text(size = 10))
+
+
 
 
 # ANALYSIS OF VERTEBRATE BIODIVERSITY
@@ -249,7 +254,7 @@ vert_abundances <- vert_abundances %>%
   complete(vernacularName, site, fill = list(total_count = 0))
 
 
-ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
+vert_abundances_plot <- ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0,17600) +
   geom_text(
@@ -261,10 +266,9 @@ ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   labs(x = "Bat Species*", y = "Species Call Occurrence") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
 
-# then can do calls per audiomoth!
-# no - not informative, data too messy/ sample too small
 
 # number of vertebrate species present on each slope, from all data
 vert_alpha_div <- vert_data %>%
@@ -304,7 +308,7 @@ vert_total_div <- vert_alpha_div
 vert_sample_div <- rbind(vert_transect_div, vert_audiomoth_div, vert_camera_div, vert_total_div)
 
 # plot vert div data
-ggplot(vert_sample_div, aes(x = sample, y = no_species, fill = site)) +
+vert_richness_plot <- ggplot(vert_sample_div, aes(x = sample, y = no_species, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0, 26) +
   geom_text(
@@ -313,30 +317,32 @@ ggplot(vert_sample_div, aes(x = sample, y = no_species, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Sampling Method", y = "Number of vertebrate species") + 
+  labs(x = "Sampling Method", y = "Species Richness") + 
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# still need to adjust text sizes
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
+
 
 
 
 # BETA DIVERSITY
 
-# remove vertebrate presence data
+# remove vertebrate presence data, as this cannot be used to calculate diversity
 arran_data_full2 <- arran_data_full[-(236:281), ]
 
-arran_class_abundance <- arran_data_full2 %>%
-  group_by(site, class) %>% # Group by site
+# calculate order abundances
+arran_order_abundance <- arran_data_full2 %>%
+  group_by(site, order) %>% # Group by site
   summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
-
 # remove empty rows of data - i.e. samples where nothing was found
-arran_class_abundance <- arran_class_abundance %>%
+arran_order_abundance <- arran_order_abundance %>%
   filter(total_count != 0)
+arran_order_abundance <- arran_order_abundance[-1,]
 
-# rearrange data set
-arran_data_rearranged <- arran_class_abundance %>%
-  tidyr::pivot_wider(names_from = class, values_from = total_count, values_fill = 0) %>%
+# rearrange order abundance data set
+arran_data_rearranged <- arran_order_abundance %>%
+  tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
   column_to_rownames(var = "site")
 
 # Set the 'site' column as row names using tibble's function
@@ -365,19 +371,6 @@ arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons, arra
 # Slope A has higher diversity
 
 arran_diversity_indicies$sample <- c("Total Slope Diversity")
-
-# rearrange to long form to plot
-arran_diversity_long <- arran_diversity_indicies %>%
-  pivot_longer(cols = starts_with("Slope"), names_to = "Slope", values_to = "Diversity") %>%
-  rename(Index = diversity_index)
-
-# plot diversity indices
-ggplot(arran_diversity_long, aes(x = Slope, y = Diversity)) +
-  geom_point(aes(colour = Index), na.rm = T, size = 3) +
-  labs(x = "Proposed Site", y = "Class Diversity", colour = "Diversity Indices") +
-  scale_x_discrete(labels = c("Slope A", "Slope B"))+
-  scale_colour_manual(values = c("thistle2", "thistle")) +
-  theme_bw()
 
 
 # repeat for sweep netting only
@@ -500,11 +493,32 @@ all_diversity_long <- all_sample_div %>%
   rename(Index = diversity_index)
 
 # plot diversity indices
-ggplot(all_diversity_long, aes(x = Index, y = Diversity)) +
+total_diversity_plot <- ggplot(all_diversity_long, aes(x = Index, y = Diversity)) +
   geom_point(aes(colour = Slope), na.rm = T, size = 3, alpha = 0.8) +
   facet_wrap(~sample, ncol = 5, nrow = 1) +
-  labs(x = "Diversity Index", y = "Diversity", colour = "Slope") +
+  labs(x = "Diversity Index", y = "Order Diversity", colour = "Slope") +
   scale_x_discrete(labels = c("Shannon's", "Simpson's"))+
   scale_colour_manual(values = c("purple", "purple4"), labels = c("Slope A", "Slope B")) +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15))
+
+
+# SAVE ALL GRAPHS
+invert_order_abundance_plot1 # order abundance on each slope
+ggsave("./Figures/invert_order_abundance_plot1.png", width = 30, height = 20, units = "cm")
+
+invert_order_abundance_plot2 # order abundance obtained from each sample technique on each slope
+ggsave("./Figures/invert_order_abundance_plot2.png", width = 50, height = 30, units = "cm")
+
+invert_order_richness_plot # order richness obtained from each sample technique on each slope
+ggsave("./Figures/invert_order_richness_plot.png", width = 30, height = 20, units = "cm")
+
+vert_abundances_plot # call occurrence (approximation of species abundance) of bat species on each slope
+ggsave("./Figures/vert_abundances_plot.png", width = 30, height = 20, units = "cm")
+
+vert_richness_plot # species richness obtained from each sample technique on each slope
+ggsave("./Figures/vert_richness_plot.png", width = 30, height = 20, units = "cm")
+
+total_diversity_plot # diversity indices obtained from each sample technique on each slope 
+ggsave("./Figures/total_diversity_plot.png", width = 25, height = 10, units = "cm")

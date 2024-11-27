@@ -90,21 +90,7 @@ ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 # then can do calls per audiomoth!
-vert_abundances_by_device <- vert_count_data2 %>%
-  group_by(site, eventID, vernacularName) %>%
-  summarise(total_count = sum(individualCount), .groups = "drop")
-
-# remove outlier audiomoth
-vert_abundances_by_device <- vert_abundances_by_device %>%
-  filter(total_count <= 1000)
-
-ggplot(vert_abundances_by_device, aes(x = vernacularName, y = total_count, fill = site)) +
-  geom_boxplot(width = 0.4) +
-  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
-  labs(x = "Proposed Site", y = "Number of calls recorded per audiomoth device") +
-  #scale_x_discrete(labels = c("North Slope", "South Slope")) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# no - not informative, data too messy/ sample too small
 
 vert_alpha_div <- vert_data %>%
   group_by(site) %>% # Group by site

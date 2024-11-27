@@ -209,21 +209,21 @@ rownames(arran_data_rearranged) <- arran_data_rearranged$site
 arran_shannons <- diversity(arran_data_rearranged[,1:11])
 arran_shannons <- as.numeric(arran_shannons)
 
-shannons_Slope A <- arran_shannons[2]
-shannons_Slope B <- arran_shannons[1]
+shannons_slopeA <- arran_shannons[2]
+shannons_slopeB <- arran_shannons[1]
 
-arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope A = numeric(0), Slope B = numeric(0))
-arran_shannons <- data.frame(diversity_index = "shannons", Slope A = shannons_Slope A, Slope B = shannons_Slope B)
+arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0))
+arran_shannons <- data.frame(diversity_index = "shannons", Slope_A = shannons_slopeA, Slope_B = shannons_slopeB)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons)
 
 # simpsons
 arran_simpsons <- diversity(arran_data_rearranged[,1:11], index = "simpson")
 arran_simpsons <- as.numeric(arran_simpsons)
 
-simpsons_Slope A <- arran_simpsons[2]
-simpsons_Slope B <- arran_simpsons[1]
+simpsons_slopeA <- arran_simpsons[2]
+simpsons_slopeB <- arran_simpsons[1]
 
-arran_simpsons <- data.frame(diversity_index = "simpsons", Slope A = simpsons_Slope A, Slope B = simpsons_Slope B)
+arran_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = simpsons_slopeA, Slope_B = simpsons_slopeB)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
 # Slope A has higher diversity
 

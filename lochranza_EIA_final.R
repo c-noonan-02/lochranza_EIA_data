@@ -380,15 +380,101 @@ ggplot(arran_diversity_long, aes(x = Slope, y = Diversity)) +
   scale_colour_manual(values = c("thistle2", "thistle")) +
   theme_bw()
 
-# repeat for moth trap only
 
-# repeat for vertebrate terrestrial sampling only
+# repeat for sweep netting only
+
+# repeat for moth trap only
+invert_moth_abundances
+# rearrange data set
+invert_moth_data_rearranged <- invert_moth_abundances %>%
+  tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
+  column_to_rownames(var = "site")
+# Set the 'site' column as row names using tibble's function
+rownames(invert_moth_data_rearranged) <- invert_moth_data_rearranged$site
+# shannons
+invert_moth_shannons <- diversity(invert_moth_data_rearranged)
+invert_moth_shannons_slopeA <- invert_moth_shannons[2]
+invert_moth_shannons_slopeB <- invert_moth_shannons[1]
+# simpsons
+invert_moth_simpsons <- diversity(invert_moth_data_rearranged, index = "simpson")
+invert_moth_simpsons_slopeA <- invert_moth_simpsons[2]
+invert_moth_simpsons_slopeB <- invert_moth_simpsons[1]
+# combine moth indices
+invert_moth_div_indices <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0), sample = character(0))
+invert_moth_shannons <- data.frame(diversity_index = "shannons", Slope_A = invert_moth_shannons_slopeA, Slope_B = invert_moth_shannons_slopeB, sample = "Moth Traps")
+invert_moth_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = invert_moth_simpsons_slopeA, Slope_B = invert_moth_simpsons_slopeB, sample = "Moth Traps")
+invert_moth_diversity_indices <- rbind(invert_moth_div_indices, invert_moth_shannons, invert_moth_simpsons)
 
 # repeat for streams only
+invert_stream_abundances
+# rearrange data set
+invert_stream_data_rearranged <- invert_stream_abundances %>%
+  tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
+  column_to_rownames(var = "site")
+# Set the 'site' column as row names using tibble's function
+rownames(invert_stream_data_rearranged) <- invert_stream_data_rearranged$site
+# shannons
+invert_stream_shannons <- diversity(invert_stream_data_rearranged)
+invert_stream_shannons_slopeA <- invert_stream_shannons[2]
+invert_stream_shannons_slopeB <- invert_stream_shannons[1]
+# simpsons
+invert_stream_simpsons <- diversity(invert_stream_data_rearranged, index = "simpson")
+invert_stream_simpsons_slopeA <- invert_stream_simpsons[2]
+invert_stream_simpsons_slopeB <- invert_stream_simpsons[1]
+# combine stream indices
+invert_stream_div_indices <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0), sample = character(0))
+invert_stream_shannons <- data.frame(diversity_index = "shannons", Slope_A = invert_stream_shannons_slopeA, Slope_B = invert_stream_shannons_slopeB, sample = "Stream Kick Sampling")
+invert_stream_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = invert_stream_simpsons_slopeA, Slope_B = invert_stream_simpsons_slopeB, sample = "Stream Kick Sampling")
+invert_stream_diversity_indices <- rbind(invert_stream_div_indices, invert_stream_shannons, invert_stream_simpsons)
 
 # repeat for bog only
+invert_bog_abundances
+# rearrange data set
+invert_bog_data_rearranged <- invert_bog_abundances %>%
+  tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
+  column_to_rownames(var = "site")
+# Set the 'site' column as row names using tibble's function
+rownames(invert_bog_data_rearranged) <- invert_bog_data_rearranged$site
+# shannons
+invert_bog_shannons <- diversity(invert_bog_data_rearranged)
+invert_bog_shannons_slopeA <- invert_bog_shannons[2]
+invert_bog_shannons_slopeB <- invert_bog_shannons[1]
+# simpsons
+invert_bog_simpsons <- diversity(invert_bog_data_rearranged, index = "simpson")
+invert_bog_simpsons_slopeA <- invert_bog_simpsons[2]
+invert_bog_simpsons_slopeB <- invert_bog_simpsons[1]
+# combine bog indices
+invert_bog_div_indices <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0), sample = character(0))
+invert_bog_shannons <- data.frame(diversity_index = "shannons", Slope_A = invert_stream_shannons_slopeA, Slope_B = invert_stream_shannons_slopeB, sample = "Bog Sampling")
+invert_bog_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = invert_stream_simpsons_slopeA, Slope_B = invert_stream_simpsons_slopeB, sample = "Bog Sampling")
+invert_bog_diversity_indices <- rbind(invert_stream_div_indices, invert_stream_shannons, invert_stream_simpsons)
 
 # repeat for bats only
+# abundances of each invertebrate order
+vert_audiomoth_abundances <- vert_abundances
+# rearrange data set
+vert_audiomoth_data_rearranged <- vert_audiomoth_abundances %>%
+  tidyr::pivot_wider(names_from = vernacularName, values_from = total_count, values_fill = 0) %>%
+  column_to_rownames(var = "site")
+# Set the 'site' column as row names using tibble's function
+rownames(vert_audiomoth_data_rearranged) <- vert_audiomoth_data_rearranged$site
+# shannons
+vert_audiomoth_shannons <- diversity(vert_audiomoth_data_rearranged)
+vert_audiomoth_shannons_slopeA <- vert_audiomoth_shannons[2]
+vert_audiomoth_shannons_slopeB <- vert_audiomoth_shannons[1]
+# simpsons
+vert_audiomoth_simpsons <- diversity(vert_audiomoth_data_rearranged, index = "simpson")
+vert_audiomoth_simpsons_slopeA <- vert_audiomoth_simpsons[2]
+vert_audiomoth_simpsons_slopeB <- vert_audiomoth_simpsons[1]
+# combine audiomoth indices
+vert_audiomoth_div_indices <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0), sample = character(0))
+vert_audiomoth_shannons <- data.frame(diversity_index = "shannons", Slope_A = vert_audiomoth_shannons_slopeA, Slope_B = vert_audiomoth_shannons_slopeB, sample = "Audiomoths")
+vert_audiomoth_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = vert_audiomoth_simpsons_slopeA, Slope_B = vert_audiomoth_simpsons_slopeB, sample = "Audiomoths")
+vert_audiomoth_diversity_indices <- rbind(vert_audiomoth_div_indices, vert_audiomoth_shannons, vert_audiomoth_simpsons)
+
+all_sample_div <- rbind(invert_moth_diversity_indices, invert_stream_diversity_indices, invert_bog_diversity_indices, vert_audiomoth_diversity_indices)
+#vert_sample_div <- rbind(invert_sweep_diversity_indices, invert_moth_diversity_indices, invert_stream_diversity_indices, invert_bog_diversity_indices, vert_audiomoth_diversity_indices)
+
 
 
 

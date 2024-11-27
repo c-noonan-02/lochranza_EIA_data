@@ -31,6 +31,9 @@ vert_data <- arran_data_full %>% slice(236:302)
 # but for counts or diversity yse vert_count_data
 vert_count_data <- vert_data %>% slice(47:67)
 
+
+
+
 # ANALYSIS OF INVERTEBRATE BIODIVERSITY 
 # subset the data on invertebrates
 invert_data <- arran_data_full %>% slice(1:235)
@@ -81,6 +84,7 @@ ggplot(invert_alpha_div, aes(x = site, y = no_orders, fill = site)) +
 # still need to change axis labels Slope B and Slope A to Slope B and Slope A
 # and adjust text size
 
+# analysis of vertebrate data - streams
 
 
 
@@ -150,10 +154,6 @@ ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
 #   filter(individualCount != 0)
 # unique(arran_data_full$class)
 # 
-# arran_class_abundance <- arran_data_full %>%
-#   group_by(site, class) %>% # Group by site
-#   summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
-# 
 # ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
 #   geom_bar(stat = "identity", position = "dodge", colour = "black") +
 #   geom_text(
@@ -194,12 +194,24 @@ ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
 # # also not informative
 
 
-# BETA DIVERSITY - SHANNONS
+# BETA DIVERSITY
+
+# remove vertebrate presence data
+arran_data_full2 <- arran_data_full[-(236:281), ]
+
+arran_class_abundance <- arran_data_full2 %>%
+  group_by(site, class) %>% # Group by site
+  summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
+
+# remove empty rows of data - i.e. samples where nothing was found
+arran_class_abundance <- arran_class_abundance %>%
+  filter(total_count != 0)
 
 # rearrange data set
 arran_data_rearranged <- arran_class_abundance %>%
   tidyr::pivot_wider(names_from = class, values_from = total_count, values_fill = 0) %>%
   column_to_rownames(var = "site")
+
 # Set the 'site' column as row names using tibble's function
 rownames(arran_data_rearranged) <- arran_data_rearranged$site
 #arran_data_rearranged <- arran_data_rearranged[, -1]  # Remove the 'site' column
@@ -227,7 +239,31 @@ arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
 # Slope A has higher diversity
 
 arran_diversity_indicies
-# plot this
+
+# rearrange to long form to plot
+arran_diversity_long <- arran_diversity_indicies %>%
+  pivot_longer(cols = starts_with("Slope"), names_to = "Slope", values_to = "Diversity") %>%
+  rename(Index = diversity_index)
+
+# plot diversity indices
+ggplot(arran_diversity_long, aes(x = Slope, y = Diversity)) +
+  geom_point(aes(colour = Index), na.rm = T, size = 3) +
+  labs(x = "Proposed Site", y = "Class Diversity", colour = "Diversity Indices") +
+  scale_x_discrete(labels = c("Slope A", "Slope B"))+
+  scale_colour_manual(values = c("thistle2", "thistle")) +
+  theme_bw()
+
+# repeat for moth trap only
+
+# repeat for vertebrate terrestrial sampling only
+
+# repeat for streams only
+
+# repeat for bog only
+
+# repeat for bats only
+
+
 
 # stuff
 #select(-genre, -spotify_monthly_listeners, -year_founded)

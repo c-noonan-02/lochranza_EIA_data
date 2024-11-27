@@ -61,9 +61,13 @@ vert_abundances <- vert_count_data %>%
   group_by(site, vernacularName) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
 
-vert_alpha_div <- vert_count_data %>%
-  group_by(site) %>% # Group by site
-  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+vert_abundances_zeros <- data.frame(site = character(0), vernacularName = character(0), total_count = integer(0))
+vert_abundances_zeros1 <- data.frame(site = "north", vernacularName = "Red_Deer", total_count = 0)
+vert_abundances_zeros2 <- data.frame(site = "south", vernacularName = "Brown_long-eared_bat", total_count = 0)
+vert_abundances_zeros3 <- data.frame(site = "south", vernacularName = "European_Robin", total_count = 0)
+vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros1, vert_abundances_zeros2, vert_abundances_zeros3)
+
+vert_abundances <- rbind(vert_abundances, vert_abundances_zeros)
 
 ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
@@ -78,17 +82,12 @@ ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-vert_abundances <- vert_abundances %>%
-  filter(vernacularName != "Common_pipistrelle")
-vert_abundances <- vert_abundances %>%
-  filter(vernacularName != "Soprano_pipistrelle")
+vert_alpha_div <- vert_count_data %>%
+  group_by(site) %>% # Group by site
+  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
 
 # BATS POOR TO VISUALISE... REMOVE OR DO AS COUNT PER AUDIOMOTH INSTEAD?
 
-# ABUNDANCE
-arran_alpha_div <- arran_data_full %>%
-  group_by(site, vernacularName) %>%
-  summarise(total_count = sum(individualCount), .groups = "drop")
 
 # ALPHA DIVERSITY
 # Summarise the number of species per site
@@ -126,9 +125,6 @@ arran_data_rearranged <- arran_alpha_div %>%
 rownames(arran_data_rearranged) <- arran_data_rearranged$site
 #arran_data_rearranged <- arran_data_rearranged[, -1]  # Remove the 'site' column
 
-# create empty dataframe to store the calculated diversity indices in
-arran_diversity_indicies <- data.frame(diversity_index = character(0), south = integer(0), north = integer(0))
-
 # shannons
 arran_shannons <- diversity(arran_data_rearranged[,1:11])
 arran_shannons <- as.numeric(arran_shannons)
@@ -136,6 +132,7 @@ arran_shannons <- as.numeric(arran_shannons)
 shannons_south <- arran_shannons[2]
 shannons_north <- arran_shannons[1]
 
+arran_diversity_indicies <- data.frame(diversity_index = character(0), south = numeric(0), north = numeric(0))
 arran_shannons <- data.frame(diversity_index = "shannons", south = shannons_south, north = shannons_north)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons)
 
@@ -150,9 +147,36 @@ arran_simpsons <- data.frame(diversity_index = "simpsons", south = simpsons_sout
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
 # south has higher diversity
 
+arran_diversity_indicies
+
 
 # HAVE DONE BY SLOPE, WHAT ABOUT BY SAMPLE BY SLOPE AS IN MY DISS?
 # could then use more interesting plots like boxplots
+
+# ALPHA DIVERSITY
+# Summarise the number of species per site
+unique(arran_data_full$class)
+arran_data_full <- arran_data_full %>%
+  filter(individualCount != 0)
+unique(arran_data_full$class)
+
+sample_alpha_div <- arran_data_full %>%
+  group_by(site, eventID, class) %>% # Group by site
+  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+
+ggplot(sample_alpha_div, aes(x = site, y = no_species)) +
+  geom_boxplot(width = 0.4, fill = "thistle") +
+  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
+  labs(x = "Proposed Site", y = "Number of species") +
+  scale_x_discrete(labels = c("North Slope", "South Slope")) +
+  theme_bw()
+
+# DIVERSITY
+# rearrange dataset
+# don't take from alpha, take from main dataframe
+sample_data_rearranged <- sample_alpha_div %>%
+  tidyr::pivot_wider(names_from = order, values_from = no_species, values_fill = 0) %>%
+  column_to_rownames(var = "site")
 
 # stuff
 #select(-genre, -spotify_monthly_listeners, -year_founded)

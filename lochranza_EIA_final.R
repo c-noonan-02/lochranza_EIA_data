@@ -25,24 +25,26 @@ arran_data_full$individualCount <- as.numeric(arran_data_full$individualCount)
 str(arran_data_full)
 
 # create subsets of the data
-invert_data <- arran_data_full %>% slice(1:235)
+
 vert_data <- arran_data_full %>% slice(236:302)
 # for total number of vertebrate species use vert_data
 # but for counts or diversity yse vert_count_data
 vert_count_data <- vert_data %>% slice(47:67)
 
 # ANALYSIS OF INVERTEBRATE BIODIVERSITY 
+# subset the data on invertebrates
+invert_data <- arran_data_full %>% slice(1:235)
+
+# remove any instances witch could not be identified to order
 invert_data <- invert_data %>%
   filter(order != "")
 
+# abundances of each invertebrate order
 invert_abundances <- invert_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
 
-invert_alpha_div <- invert_data %>%
-  group_by(site) %>% # Group by site
-  summarise(no_orders = n_distinct(order), .groups = "drop") # Count unique species
-
+# plot abundances of each invertebrate order
 ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
@@ -52,25 +54,53 @@ ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
     size = 3      # Adjust text size
   ) +
   labs(x = "Order", y = "Order Abundance") +
-  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# still need to adjust text size?
+# change Key labels and heading
+# add zeros?
+# spread out bars?
+
+# calculate alpha diversity (here number of unique orders) for each site
+invert_alpha_div <- invert_data %>%
+  group_by(site) %>% # Group by site
+  summarise(no_orders = n_distinct(order), .groups = "drop") # Count unique species
+
+ggplot(invert_alpha_div, aes(x = site, y = no_orders, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  geom_text(
+    aes(label = no_orders),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Proposed Site", y = "Number of invertebrate orders") + 
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
+  theme_bw()
+# still need to change axis labels Slope B and Slope A to Slope B and Slope A
+# and adjust text size
+
+
+
 
 # ANALYSIS OF VERTEBRATE BIODIVERSITY
  
 # remove camera trap data due to small sample size
 vert_count_data2 <- vert_count_data %>%
-  filter(samplingProtocol != "Camera_traps")
+  filter(samplingProtocol != "Camera traps")
 
+# rearrange for total count for each species by slope
 vert_abundances <- vert_count_data2 %>%
   group_by(site, vernacularName) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
 
+# set missing data to zeros to improve graph look
 vert_abundances_zeros <- data.frame(site = character(0), vernacularName = character(0), total_count = integer(0))
-#vert_abundances_zeros1 <- data.frame(site = "north", vernacularName = "Red_Deer", total_count = 0)
-vert_abundances_zeros2 <- data.frame(site = "south", vernacularName = "Brown_long-eared_bat", total_count = 0)
-#vert_abundances_zeros3 <- data.frame(site = "south", vernacularName = "European_Robin", total_count = 0)
-vert_abundances_zeros4 <- data.frame(site = "south", vernacularName = "Soprano_pipistrelle", total_count = 0)
+#vert_abundances_zeros1 <- data.frame(site = "Slope B", vernacularName = "Red_Deer", total_count = 0)
+vert_abundances_zeros2 <- data.frame(site = "Slope A", vernacularName = "Brown_long-eared_bat", total_count = 0)
+#vert_abundances_zeros3 <- data.frame(site = "Slope A", vernacularName = "European_Robin", total_count = 0)
+vert_abundances_zeros4 <- data.frame(site = "Slope A", vernacularName = "Soprano_pipistrelle", total_count = 0)
 vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros2, vert_abundances_zeros4)
 #vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros1, vert_abundances_zeros2, vert_abundances_zeros3, vert_abundances_zeros4)
 
@@ -85,16 +115,18 @@ ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
     size = 3      # Adjust text size
   ) +
   labs(x = "Species", y = "Species Count") +
-  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 # then can do calls per audiomoth!
 # no - not informative, data too messy/ sample too small
 
+# number of vertebrate species present on each slope, from all data
 vert_alpha_div <- vert_data %>%
   group_by(site) %>% # Group by site
   summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+
 #plot this!!!
 ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
@@ -105,12 +137,13 @@ ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
     size = 3      # Adjust text size
     ) +
   labs(x = "Proposed Site", y = "Number of vertebrate species") + 
-  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
-  theme_bw() #+
-  #theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
+  theme_bw()
+# still need to adjust text sizes
+# sort legend
 
 
-# ALPHA DIVERSITY
+# ALPHA DIVERSITY OVERALL
 # Summarise the number of species, per class, per site
 unique(arran_data_full$class)
 arran_data_full <- arran_data_full %>%
@@ -119,21 +152,22 @@ unique(arran_data_full$class)
 
 arran_class_abundance <- arran_data_full %>%
   group_by(site, class) %>% # Group by site
-  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+  summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
 
-ggplot(arran_class_abundance, aes(x = class, y = no_species, fill = site)) +
+ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
-    aes(label = no_species),
+    aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Class", y = "Species Count") +
-  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
+  labs(x = "Class", y = "Total Abundance") +
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# overall pretty similar - but south fairing slightly better?
+# overall pretty similar - but Slope A fairing slightly better?
+# not very informative though
 
 # Summarise the number of species, per order, per site
 unique(arran_data_full$order)
@@ -141,22 +175,24 @@ arran_data_full <- arran_data_full %>%
   filter(individualCount != 0)
 unique(arran_data_full$order)
 
+# CHANGE FROM NUMBER OF SPECIES TO NUMBER OF INDIVIDUALS
 arran_order_abundance <- arran_data_full %>%
   group_by(site, order) %>% # Group by site
-  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+  summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
 
-ggplot(arran_order_abundance, aes(x = order, y = no_species, fill = site)) +
+ggplot(arran_order_abundance, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   geom_text(
-    aes(label = no_species),
+    aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Order", y = "Species Count") +
-  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
+  labs(x = "Order", y = "Total Abundance") +
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# also not informative
 
 
 # BETA DIVERSITY - SHANNONS
@@ -173,23 +209,23 @@ rownames(arran_data_rearranged) <- arran_data_rearranged$site
 arran_shannons <- diversity(arran_data_rearranged[,1:11])
 arran_shannons <- as.numeric(arran_shannons)
 
-shannons_south <- arran_shannons[2]
-shannons_north <- arran_shannons[1]
+shannons_Slope A <- arran_shannons[2]
+shannons_Slope B <- arran_shannons[1]
 
-arran_diversity_indicies <- data.frame(diversity_index = character(0), south = numeric(0), north = numeric(0))
-arran_shannons <- data.frame(diversity_index = "shannons", south = shannons_south, north = shannons_north)
+arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope A = numeric(0), Slope B = numeric(0))
+arran_shannons <- data.frame(diversity_index = "shannons", Slope A = shannons_Slope A, Slope B = shannons_Slope B)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons)
 
 # simpsons
 arran_simpsons <- diversity(arran_data_rearranged[,1:11], index = "simpson")
 arran_simpsons <- as.numeric(arran_simpsons)
 
-simpsons_south <- arran_simpsons[2]
-simpsons_north <- arran_simpsons[1]
+simpsons_Slope A <- arran_simpsons[2]
+simpsons_Slope B <- arran_simpsons[1]
 
-arran_simpsons <- data.frame(diversity_index = "simpsons", south = simpsons_south, north = simpsons_north)
+arran_simpsons <- data.frame(diversity_index = "simpsons", Slope A = simpsons_Slope A, Slope B = simpsons_Slope B)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
-# south has higher diversity
+# Slope A has higher diversity
 
 arran_diversity_indicies
 
@@ -211,7 +247,7 @@ ggplot(sample_class, aes(x = site, y = no_species)) +
   geom_boxplot(width = 0.4, fill = "thistle") +
   geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
   labs(x = "Proposed Site", y = "Number of classes per sampling event") +
-  scale_x_discrete(labels = c("North Slope", "South Slope")) +
+  scale_x_discrete(labels = c("Slope B Slope", "Slope A Slope")) +
   theme_bw()
 
 unique(arran_data_full$order)
@@ -229,7 +265,7 @@ ggplot(sample_order, aes(x = site, y = no_species)) +
   geom_boxplot(width = 0.4, fill = "thistle") +
   geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
   labs(x = "Proposed Site", y = "Number of orders per sampling event") +
-  scale_x_discrete(labels = c("North Slope", "South Slope")) +
+  scale_x_discrete(labels = c("Slope B Slope", "Slope A Slope")) +
   theme_bw()
 
 

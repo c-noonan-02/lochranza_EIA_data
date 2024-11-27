@@ -320,52 +320,6 @@ ggplot(vert_sample_div, aes(x = sample, y = no_species, fill = site)) +
 # still need to adjust text sizes
 
 
-# # ALPHA DIVERSITY OVERALL
-# # Summarise the number of species, per class, per site
-# unique(arran_data_full$class)
-# arran_data_full <- arran_data_full %>%
-#   filter(individualCount != 0)
-# unique(arran_data_full$class)
-# 
-# ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
-#   geom_bar(stat = "identity", position = "dodge", colour = "black") +
-#   geom_text(
-#     aes(label = total_count),
-#     position = position_dodge(width = 0.9), # Adjust text position to align with bars
-#     vjust = -0.5, # Position text slightly above the bars
-#     size = 3      # Adjust text size
-#   ) +
-#   labs(x = "Class", y = "Total Abundance") +
-#   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
-#   theme_bw() +
-#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# # overall pretty similar - but Slope A fairing slightly better?
-# # not very informative though
-# 
-# # Summarise the number of species, per order, per site
-# unique(arran_data_full$order)
-# arran_data_full <- arran_data_full %>%
-#   filter(individualCount != 0)
-# unique(arran_data_full$order)
-# 
-# arran_order_abundance <- arran_data_full %>%
-#   group_by(site, order) %>% # Group by site
-#   summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
-# 
-# ggplot(arran_order_abundance, aes(x = order, y = total_count, fill = site)) +
-#   geom_bar(stat = "identity", position = "dodge", colour = "black") +
-#   geom_text(
-#     aes(label = total_count),
-#     position = position_dodge(width = 0.9), # Adjust text position to align with bars
-#     vjust = -0.5, # Position text slightly above the bars
-#     size = 3      # Adjust text size
-#   ) +
-#   labs(x = "Order", y = "Total Abundance") +
-#   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
-#   theme_bw() +
-#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# # also not informative
-
 
 # BETA DIVERSITY
 

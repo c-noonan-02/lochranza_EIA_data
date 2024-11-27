@@ -93,6 +93,7 @@ invert_sweep_abundances <- invert_sweep_abundances %>%
 # plot this data
 invert_sweep_abundances_plot <- ggplot(invert_sweep_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 85) +            # Set y-axis limits from 0 to 500
   geom_text(
     aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
@@ -123,6 +124,7 @@ invert_moth_abundances <- invert_moth_abundances %>%
 # plot this data
 invert_moth_abundances_plot <- ggplot(invert_moth_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 18) +
   geom_text(
     aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
@@ -153,6 +155,7 @@ invert_stream_abundances <- invert_stream_abundances %>%
 # plot this data
 invert_stream_abundances_plot <- ggplot(invert_stream_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 17) +
   geom_text(
     aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
@@ -183,6 +186,7 @@ invert_bog_abundances <- invert_bog_abundances %>%
 # plot this data
 invert_bog_abundances_plot <- ggplot(invert_bog_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 25) +
   geom_text(
     aes(label = total_count),
     position = position_dodge(width = 0.9), # Adjust text position to align with bars
@@ -229,24 +233,17 @@ ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
 # ANALYSIS OF VERTEBRATE BIODIVERSITY
  
 # remove camera trap data due to small sample size
-vert_count_data2 <- vert_count_data %>%
+vert_count_data <- vert_count_data %>%
   filter(samplingProtocol != "Camera traps")
 
 # rearrange for total count for each species by slope
-vert_abundances <- vert_count_data2 %>%
+vert_abundances <- vert_count_data %>%
   group_by(site, vernacularName) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
 
-# set missing data to zeros to improve graph look
-vert_abundances_zeros <- data.frame(site = character(0), vernacularName = character(0), total_count = integer(0))
-#vert_abundances_zeros1 <- data.frame(site = "Slope B", vernacularName = "Red_Deer", total_count = 0)
-vert_abundances_zeros2 <- data.frame(site = "Slope A", vernacularName = "Brown_long-eared_bat", total_count = 0)
-#vert_abundances_zeros3 <- data.frame(site = "Slope A", vernacularName = "European_Robin", total_count = 0)
-vert_abundances_zeros4 <- data.frame(site = "Slope A", vernacularName = "Soprano_pipistrelle", total_count = 0)
-vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros2, vert_abundances_zeros4)
-#vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros1, vert_abundances_zeros2, vert_abundances_zeros3, vert_abundances_zeros4)
-
-vert_abundances <- rbind(vert_abundances, vert_abundances_zeros)
+# add zeros for orders not present on one slope but present on another
+vert_abundances <- vert_abundances %>%
+  complete(order, site, fill = list(total_count = 0))
 
 ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +

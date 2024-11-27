@@ -350,10 +350,6 @@ arran_shannons <- as.numeric(arran_shannons)
 shannons_slopeA <- arran_shannons[2]
 shannons_slopeB <- arran_shannons[1]
 
-arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0))
-arran_shannons <- data.frame(diversity_index = "shannons", Slope_A = shannons_slopeA, Slope_B = shannons_slopeB)
-arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons)
-
 # simpsons
 arran_simpsons <- diversity(arran_data_rearranged[,1:11], index = "simpson")
 arran_simpsons <- as.numeric(arran_simpsons)
@@ -361,11 +357,14 @@ arran_simpsons <- as.numeric(arran_simpsons)
 simpsons_slopeA <- arran_simpsons[2]
 simpsons_slopeB <- arran_simpsons[1]
 
+# combine indices into one dataframe
+arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0))
+arran_shannons <- data.frame(diversity_index = "shannons", Slope_A = shannons_slopeA, Slope_B = shannons_slopeB)
 arran_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = simpsons_slopeA, Slope_B = simpsons_slopeB)
-arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
+arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons, arran_simpsons)
 # Slope A has higher diversity
 
-arran_diversity_indicies
+arran_diversity_indicies$sample <- c("Total Slope Diversity")
 
 # rearrange to long form to plot
 arran_diversity_long <- arran_diversity_indicies %>%
@@ -382,6 +381,27 @@ ggplot(arran_diversity_long, aes(x = Slope, y = Diversity)) +
 
 
 # repeat for sweep netting only
+invert_sweep_abundances
+
+invert_sweep_data_rearranged <- invert_sweep_abundances %>%
+  tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
+  column_to_rownames(var = "site")
+# Set the 'site' column as row names using tibble's function
+rownames(invert_sweep_data_rearranged) <- invert_sweep_data_rearranged$site
+# shannons
+invert_sweep_shannons <- diversity(invert_sweep_data_rearranged)
+invert_sweep_shannons_slopeA <- invert_sweep_shannons[2]
+invert_sweep_shannons_slopeB <- invert_sweep_shannons[1]
+# simpsons
+invert_sweep_simpsons <- diversity(invert_sweep_data_rearranged, index = "simpson")
+invert_sweep_simpsons_slopeA <- invert_sweep_simpsons[2]
+invert_sweep_simpsons_slopeB <- invert_sweep_simpsons[1]
+# combine moth indices
+invert_sweep_div_indices <- data.frame(diversity_index = character(0), Slope_A = numeric(0), Slope_B = numeric(0), sample = character(0))
+invert_sweep_shannons <- data.frame(diversity_index = "shannons", Slope_A = invert_sweep_shannons_slopeA, Slope_B = invert_sweep_shannons_slopeB, sample = "Terrestrial Sweep Netting")
+invert_sweep_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = invert_sweep_simpsons_slopeA, Slope_B = invert_sweep_simpsons_slopeB, sample = "Terrestrial Sweep Netting")
+invert_sweep_diversity_indices <- rbind(invert_sweep_div_indices, invert_sweep_shannons, invert_sweep_simpsons)
+
 
 # repeat for moth trap only
 invert_moth_abundances
@@ -471,11 +491,31 @@ vert_audiomoth_div_indices <- data.frame(diversity_index = character(0), Slope_A
 vert_audiomoth_shannons <- data.frame(diversity_index = "shannons", Slope_A = vert_audiomoth_shannons_slopeA, Slope_B = vert_audiomoth_shannons_slopeB, sample = "Audiomoths")
 vert_audiomoth_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = vert_audiomoth_simpsons_slopeA, Slope_B = vert_audiomoth_simpsons_slopeB, sample = "Audiomoths")
 vert_audiomoth_diversity_indices <- rbind(vert_audiomoth_div_indices, vert_audiomoth_shannons, vert_audiomoth_simpsons)
+# combine all diversity measures
+all_sample_div <- rbind(invert_sweep_diversity_indices, invert_moth_diversity_indices, invert_stream_diversity_indices, invert_bog_diversity_indices, vert_audiomoth_diversity_indices, arran_diversity_indicies)
 
-all_sample_div <- rbind(invert_moth_diversity_indices, invert_stream_diversity_indices, invert_bog_diversity_indices, vert_audiomoth_diversity_indices)
-#vert_sample_div <- rbind(invert_sweep_diversity_indices, invert_moth_diversity_indices, invert_stream_diversity_indices, invert_bog_diversity_indices, vert_audiomoth_diversity_indices)
+# rearrange to long form to plot
+all_diversity_long <- all_sample_div %>%
+  pivot_longer(cols = starts_with("Slope"), names_to = "Slope", values_to = "Diversity") %>%
+  rename(Index = diversity_index)
 
-
+# plot diversity indices
+ggplot(all_diversity_long, aes(x = Index, y = Diversity)) +
+  geom_point(aes(colour = Slope), na.rm = T, size = 3, alpha = 0.8) +
+  facet_wrap(~sample, ncol = 5, nrow = 1) +
+  labs(x = "Diversity Index", y = "Diversity", colour = "Slope") +
+  scale_x_discrete(labels = c("Shannon's", "Simpson's"))+
+  scale_colour_manual(values = c("purple", "purple4"), labels = c("Slope A", "Slope B")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+ggplot(all_diversity_long, aes(x = Slope, y = Diversity)) +
+  geom_point(aes(colour = Index), na.rm = T, size = 3, alpha = 0.8) +
+  facet_wrap(~sample, ncol = 5, nrow = 1) +
+  labs(x = "Proposed Site", y = "Diversity", colour = "Diversity Index") +
+  scale_x_discrete(labels = c("Slope A", "Slope B"))+
+  scale_colour_manual(values = c("thistle2", "thistle"), labels = c("Shannon's", "Simpson's")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 # stuff

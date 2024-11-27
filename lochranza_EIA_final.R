@@ -96,6 +96,18 @@ vert_alpha_div <- vert_data %>%
   group_by(site) %>% # Group by site
   summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
 #plot this!!!
+ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  geom_text(
+    aes(label = no_species),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+    ) +
+  labs(x = "Proposed Site", y = "Number of vertebrate species") + 
+  scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
+  theme_bw() #+
+  #theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 # ALPHA DIVERSITY

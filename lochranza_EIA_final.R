@@ -143,63 +143,62 @@ ggplot(vert_alpha_div, aes(x = site, y = no_species, fill = site)) +
 # sort legend
 
 
-# ALPHA DIVERSITY OVERALL
-# Summarise the number of species, per class, per site
-unique(arran_data_full$class)
-arran_data_full <- arran_data_full %>%
-  filter(individualCount != 0)
-unique(arran_data_full$class)
-
-arran_class_abundance <- arran_data_full %>%
-  group_by(site, class) %>% # Group by site
-  summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
-
-ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
-  geom_bar(stat = "identity", position = "dodge", colour = "black") +
-  geom_text(
-    aes(label = total_count),
-    position = position_dodge(width = 0.9), # Adjust text position to align with bars
-    vjust = -0.5, # Position text slightly above the bars
-    size = 3      # Adjust text size
-  ) +
-  labs(x = "Class", y = "Total Abundance") +
-  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# overall pretty similar - but Slope A fairing slightly better?
-# not very informative though
-
-# Summarise the number of species, per order, per site
-unique(arran_data_full$order)
-arran_data_full <- arran_data_full %>%
-  filter(individualCount != 0)
-unique(arran_data_full$order)
-
-# CHANGE FROM NUMBER OF SPECIES TO NUMBER OF INDIVIDUALS
-arran_order_abundance <- arran_data_full %>%
-  group_by(site, order) %>% # Group by site
-  summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
-
-ggplot(arran_order_abundance, aes(x = order, y = total_count, fill = site)) +
-  geom_bar(stat = "identity", position = "dodge", colour = "black") +
-  geom_text(
-    aes(label = total_count),
-    position = position_dodge(width = 0.9), # Adjust text position to align with bars
-    vjust = -0.5, # Position text slightly above the bars
-    size = 3      # Adjust text size
-  ) +
-  labs(x = "Order", y = "Total Abundance") +
-  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
-# also not informative
+# # ALPHA DIVERSITY OVERALL
+# # Summarise the number of species, per class, per site
+# unique(arran_data_full$class)
+# arran_data_full <- arran_data_full %>%
+#   filter(individualCount != 0)
+# unique(arran_data_full$class)
+# 
+# arran_class_abundance <- arran_data_full %>%
+#   group_by(site, class) %>% # Group by site
+#   summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
+# 
+# ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
+#   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+#   geom_text(
+#     aes(label = total_count),
+#     position = position_dodge(width = 0.9), # Adjust text position to align with bars
+#     vjust = -0.5, # Position text slightly above the bars
+#     size = 3      # Adjust text size
+#   ) +
+#   labs(x = "Class", y = "Total Abundance") +
+#   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# # overall pretty similar - but Slope A fairing slightly better?
+# # not very informative though
+# 
+# # Summarise the number of species, per order, per site
+# unique(arran_data_full$order)
+# arran_data_full <- arran_data_full %>%
+#   filter(individualCount != 0)
+# unique(arran_data_full$order)
+# 
+# arran_order_abundance <- arran_data_full %>%
+#   group_by(site, order) %>% # Group by site
+#   summarise(total_count = sum(individualCount), .groups = "drop") # sum abundance of each unique class
+# 
+# ggplot(arran_order_abundance, aes(x = order, y = total_count, fill = site)) +
+#   geom_bar(stat = "identity", position = "dodge", colour = "black") +
+#   geom_text(
+#     aes(label = total_count),
+#     position = position_dodge(width = 0.9), # Adjust text position to align with bars
+#     vjust = -0.5, # Position text slightly above the bars
+#     size = 3      # Adjust text size
+#   ) +
+#   labs(x = "Order", y = "Total Abundance") +
+#   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
+#   theme_bw() +
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# # also not informative
 
 
 # BETA DIVERSITY - SHANNONS
 
 # rearrange data set
 arran_data_rearranged <- arran_class_abundance %>%
-  tidyr::pivot_wider(names_from = class, values_from = no_species, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = class, values_from = total_count, values_fill = 0) %>%
   column_to_rownames(var = "site")
 # Set the 'site' column as row names using tibble's function
 rownames(arran_data_rearranged) <- arran_data_rearranged$site
@@ -228,55 +227,7 @@ arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
 # Slope A has higher diversity
 
 arran_diversity_indicies
-
-# HAVE DONE BY SLOPE, WHAT ABOUT BY SAMPLE BY SLOPE AS IN MY DISS?
-# could then use more interesting plots like boxplots
-
-# ALPHA DIVERSITY
-# Summarise the number of species per site
-unique(arran_data_full$class)
-arran_data_full <- arran_data_full %>%
-  filter(individualCount != 0)
-unique(arran_data_full$class)
-
-sample_class <- arran_data_full %>%
-  group_by(site, eventID, class) %>% # Group by site
-  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
-
-ggplot(sample_class, aes(x = site, y = no_species)) +
-  geom_boxplot(width = 0.4, fill = "thistle") +
-  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
-  labs(x = "Proposed Site", y = "Number of classes per sampling event") +
-  scale_x_discrete(labels = c("Slope B Slope", "Slope A Slope")) +
-  theme_bw()
-
-unique(arran_data_full$order)
-arran_data_full <- arran_data_full %>%
-  filter(individualCount != 0)
-arran_data_full <- arran_data_full %>%
-  filter(order != "")
-unique(arran_data_full$order)
-
-sample_order <- arran_data_full %>%
-  group_by(site, eventID, order) %>% # Group by site
-  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
-
-ggplot(sample_order, aes(x = site, y = no_species)) +
-  geom_boxplot(width = 0.4, fill = "thistle") +
-  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
-  labs(x = "Proposed Site", y = "Number of orders per sampling event") +
-  scale_x_discrete(labels = c("Slope B Slope", "Slope A Slope")) +
-  theme_bw()
-
-
-# DIVERSITY
-# rearrange dataset
-# don't take from alpha, take from main dataframe
-sample_data_rearranged <- sample_class %>%
-  tidyr::pivot_wider(names_from = order, values_from = no_species, values_fill = 0) %>%
-  column_to_rownames(var = "site")
-
-
+# plot this
 
 # stuff
 #select(-genre, -spotify_monthly_listeners, -year_founded)

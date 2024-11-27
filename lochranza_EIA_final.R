@@ -57,15 +57,22 @@ ggplot(invert_abundances, aes(x = order, y = total_count, fill = site)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 # ANALYSIS OF VERTEBRATE BIODIVERSITY
-vert_abundances <- vert_count_data %>%
+ 
+# remove camera trap data due to small sample size
+vert_count_data2 <- vert_count_data %>%
+  filter(samplingProtocol != "Camera_traps")
+
+vert_abundances <- vert_count_data2 %>%
   group_by(site, vernacularName) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
 
 vert_abundances_zeros <- data.frame(site = character(0), vernacularName = character(0), total_count = integer(0))
-vert_abundances_zeros1 <- data.frame(site = "north", vernacularName = "Red_Deer", total_count = 0)
+#vert_abundances_zeros1 <- data.frame(site = "north", vernacularName = "Red_Deer", total_count = 0)
 vert_abundances_zeros2 <- data.frame(site = "south", vernacularName = "Brown_long-eared_bat", total_count = 0)
-vert_abundances_zeros3 <- data.frame(site = "south", vernacularName = "European_Robin", total_count = 0)
-vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros1, vert_abundances_zeros2, vert_abundances_zeros3)
+#vert_abundances_zeros3 <- data.frame(site = "south", vernacularName = "European_Robin", total_count = 0)
+vert_abundances_zeros4 <- data.frame(site = "south", vernacularName = "Soprano_pipistrelle", total_count = 0)
+vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros2, vert_abundances_zeros4)
+#vert_abundances_zeros <- rbind(vert_abundances_zeros, vert_abundances_zeros1, vert_abundances_zeros2, vert_abundances_zeros3, vert_abundances_zeros4)
 
 vert_abundances <- rbind(vert_abundances, vert_abundances_zeros)
 
@@ -77,16 +84,32 @@ ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
     vjust = -0.5, # Position text slightly above the bars
     size = 3      # Adjust text size
   ) +
-  labs(x = "Species", y = "Species Abundance") +
+  labs(x = "Species", y = "Species Count") +
   scale_fill_manual(values = c("south" = "purple", "north" = "purple4")) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
-vert_alpha_div <- vert_count_data %>%
+# then can do calls per audiomoth!
+vert_abundances_by_device <- vert_count_data2 %>%
+  group_by(site, eventID, vernacularName) %>%
+  summarise(total_count = sum(individualCount), .groups = "drop")
+
+# remove outlier audiomoth
+vert_abundances_by_device <- vert_abundances_by_device %>%
+  filter(total_count <= 1000)
+
+ggplot(vert_abundances_by_device, aes(x = vernacularName, y = total_count, fill = site)) +
+  geom_boxplot(width = 0.4) +
+  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
+  labs(x = "Proposed Site", y = "Number of calls recorded per audiomoth device") +
+  #scale_x_discrete(labels = c("North Slope", "South Slope")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+vert_alpha_div <- vert_data %>%
   group_by(site) %>% # Group by site
   summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
-
-# BATS POOR TO VISUALISE... REMOVE OR DO AS COUNT PER AUDIOMOTH INSTEAD?
+#plot this!!!
 
 
 # ALPHA DIVERSITY
@@ -149,7 +172,6 @@ arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_simpsons)
 
 arran_diversity_indicies
 
-
 # HAVE DONE BY SLOPE, WHAT ABOUT BY SAMPLE BY SLOPE AS IN MY DISS?
 # could then use more interesting plots like boxplots
 
@@ -160,23 +182,44 @@ arran_data_full <- arran_data_full %>%
   filter(individualCount != 0)
 unique(arran_data_full$class)
 
-sample_alpha_div <- arran_data_full %>%
+sample_class <- arran_data_full %>%
   group_by(site, eventID, class) %>% # Group by site
   summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
 
-ggplot(sample_alpha_div, aes(x = site, y = no_species)) +
+ggplot(sample_class, aes(x = site, y = no_species)) +
   geom_boxplot(width = 0.4, fill = "thistle") +
   geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
-  labs(x = "Proposed Site", y = "Number of species") +
+  labs(x = "Proposed Site", y = "Number of classes per sampling event") +
   scale_x_discrete(labels = c("North Slope", "South Slope")) +
   theme_bw()
+
+unique(arran_data_full$order)
+arran_data_full <- arran_data_full %>%
+  filter(individualCount != 0)
+arran_data_full <- arran_data_full %>%
+  filter(order != "")
+unique(arran_data_full$order)
+
+sample_order <- arran_data_full %>%
+  group_by(site, eventID, order) %>% # Group by site
+  summarise(no_species = n_distinct(vernacularName), .groups = "drop") # Count unique species
+
+ggplot(sample_order, aes(x = site, y = no_species)) +
+  geom_boxplot(width = 0.4, fill = "thistle") +
+  geom_jitter(width = 0.3, colour = "purple3", alpha = 0.3) +
+  labs(x = "Proposed Site", y = "Number of orders per sampling event") +
+  scale_x_discrete(labels = c("North Slope", "South Slope")) +
+  theme_bw()
+
 
 # DIVERSITY
 # rearrange dataset
 # don't take from alpha, take from main dataframe
-sample_data_rearranged <- sample_alpha_div %>%
+sample_data_rearranged <- sample_class %>%
   tidyr::pivot_wider(names_from = order, values_from = no_species, values_fill = 0) %>%
   column_to_rownames(var = "site")
+
+
 
 # stuff
 #select(-genre, -spotify_monthly_listeners, -year_founded)

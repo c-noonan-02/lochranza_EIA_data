@@ -218,6 +218,7 @@ invert_bog_div$sample <- c("Bog Sampling")
 invert_alpha_div$sample <- c("Total Slope Sample")
 invert_sample_div <- rbind(invert_sweep_div, invert_moth_div, invert_stream_div, invert_bog_div, invert_alpha_div)
 # plot invert div data
+invert_sample_div$sample <- factor(invert_sample_div$sample, levels = c("Terrestrial Sweep Netting", "Moth Traps", "Stream Kick Sampling", "Bog Sampling", "Total Slope Sample"))
 invert_order_richness_plot <- ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0, 18) +
@@ -230,7 +231,7 @@ invert_order_richness_plot <- ggplot(invert_sample_div, aes(x = sample, y = no_o
   labs(x = "Sampling Method", y = "Order Richness") + 
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"), axis.text.x = element_text(size = 10))
+  theme(axis.title = element_text(size = 15), axis.text.x = element_text(size = 10))
 
 
 
@@ -253,7 +254,7 @@ vert_abundances <- vert_abundances %>%
   ) %>%
   complete(vernacularName, site, fill = list(total_count = 0))
 
-
+vert_abundances$vernacularName <- factor(vert_abundances$vernacularName, levels = c("Common pipistrelle", "Soprano pipistrelle", "Nathusius' pipistrelle", "Mouse-eared bats", "Brown long-eared bat"))
 vert_abundances_plot <- ggplot(vert_abundances, aes(x = vernacularName, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0,17600) +
@@ -266,8 +267,7 @@ vert_abundances_plot <- ggplot(vert_abundances, aes(x = vernacularName, y = tota
   labs(x = "Bat Species*", y = "Species Call Occurrence") +
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
-  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
+  theme(axis.title = element_text(size = 15), axis.text.x = element_text(size = 10))
 
 
 # number of vertebrate species present on each slope, from all data
@@ -308,6 +308,7 @@ vert_total_div <- vert_alpha_div
 vert_sample_div <- rbind(vert_transect_div, vert_audiomoth_div, vert_camera_div, vert_total_div)
 
 # plot vert div data
+vert_sample_div$sample <- factor(vert_sample_div$sample, levels = c("Transect Walking", "Audiomoths", "Camera Traps", "Total Slope Sample"))
 vert_richness_plot <- ggplot(vert_sample_div, aes(x = sample, y = no_species, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +
   ylim(0, 26) +
@@ -320,8 +321,7 @@ vert_richness_plot <- ggplot(vert_sample_div, aes(x = sample, y = no_species, fi
   labs(x = "Sampling Method", y = "Species Richness") + 
   scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4"), name = "Proposed Site") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
-  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
+  theme(axis.title = element_text(size = 15), axis.text.x = element_text(size = 10))
 
 
 

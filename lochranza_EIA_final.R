@@ -240,6 +240,28 @@ invert_bog_div <- invert_bog_data %>%
 #   labs(x = "Proposed Site", y = "Number of invertebrate orders", title = "Bog Invertebrate Sampling") + 
 #   theme_bw()
 
+# combine all invert habitat order diversities
+invert_sweep_div$sample <- c("Terrestrial Sweep Netting")
+invert_moth_div$sample <- c("Moth Traps")
+invert_stream_div$sample <- c("Stream Kick Sampling")
+invert_bog_div_nrow <- data.frame(site = "Slope B", no_orders = 0)
+invert_bog_div <- rbind(invert_bog_div, invert_bog_div_nrow)
+invert_bog_div$sample <- c("Bog Sampling")
+invert_sample_div <- rbind(invert_sweep_div, invert_moth_div, invert_stream_div, invert_bog_div)
+
+# plot invert div data
+ggplot(invert_sample_div, aes(x = sample, y = no_orders, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  geom_text(
+    aes(label = no_orders),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Sampling Method", y = "Number of invertebrate orders") + 
+  scale_fill_manual(values = c("Slope A" = "purple", "Slope B" = "purple4")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 
 # ANALYSIS OF VERTEBRATE BIODIVERSITY

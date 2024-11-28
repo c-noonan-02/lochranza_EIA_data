@@ -21,6 +21,8 @@ arran_data_full$eventID <- as.factor(arran_data_full$eventID)
 arran_data_full$site <- as.factor(arran_data_full$site)
 arran_data_full$samplingProtocol <- as.factor(arran_data_full$samplingProtocol)
 arran_data_full$vernacularName <- as.factor(arran_data_full$vernacularName)
+#arran_data_full$order <- as.factor(arran_data_full$order)
+#arran_data_full$class <- as.factor(arran_data_full$class)
 arran_data_full$individualCount <- as.numeric(arran_data_full$individualCount)
 # ... need to finish
 str(arran_data_full)
@@ -31,6 +33,7 @@ vert_data <- arran_data_full %>% slice(236:302)
 # for total number of vertebrate species use vert_data
 # but for counts or diversity yse vert_count_data
 vert_count_data <- vert_data %>% slice(47:67)
+# check has worked
 
 
 
@@ -38,15 +41,24 @@ vert_count_data <- vert_data %>% slice(47:67)
 # ANALYSIS OF INVERTEBRATE BIODIVERSITY 
 # subset the data on invertebrates
 invert_data <- arran_data_full %>% slice(1:235)
+invert_data <- subset(invert_data, !is.na(individualCount) & individualCount != "") # removed introduced NAs
 
-# remove any instances witch could not be identified to order
+# remove any empty rows
 invert_data <- invert_data %>%
-  filter(order != "")
+  filter(individualCount != "0")
+
+invert_data <- subset(invert_data, !is.na(order) & order != "")
+# check has worked
+length(invert_data$order)
+unique(invert_data$order)
 
 # abundances of each invertebrate order
 invert_abundances <- invert_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
+# remove empty data
+invert_abundances <- invert_abundances[-1,]
+invert_abundances <- invert_abundances[-1,]
 # add zeros for orders not present on one slope but present on another
 invert_abundances <- invert_abundances %>%
   complete(order, site, fill = list(total_count = 0))
@@ -81,6 +93,8 @@ invert_sweep_data <- rbind(invert_sweep_data1, invert_sweep_data2)
 # remove any instances witch could not be identified to order
 invert_sweep_data <- invert_sweep_data %>%
   filter(order != "")
+invert_sweep_data <- invert_sweep_data %>%
+  filter(individualCount != "0")
 # abundances of each invertebrate order
 invert_sweep_abundances <- invert_sweep_data %>%
   group_by(site, order) %>%
@@ -326,6 +340,127 @@ vert_richness_plot <- ggplot(vert_sample_div, aes(x = sample, y = no_species, fi
 
 
 
+
+# ANALYSIS OF TOTAL BIODIVERSITY
+# abundance of each order
+arran_order_abundance <- arran_data_full %>%
+  group_by(site, order) %>%
+  summarise(total_count = sum(individualCount), .groups = "drop")
+
+# remove empty rows of data
+arran_order_abundance <- subset(arran_order_abundance, !is.na(total_count) & order != "")
+
+# order richness
+arran_order_abundance <- arran_order_abundance %>%
+  filter(total_count != 0) # remove any zeros
+arran_order_richness <- arran_order_abundance %>%
+  group_by(site) %>% # Group by site
+  summarise(no_orders = n_distinct(order), .groups = "drop") # Count unique orders
+# richness plot
+arran_order_richness_plot <- ggplot(arran_order_richness, aes(x = site, y = no_orders)) +
+  geom_bar(stat = "identity", position = "dodge", fill = c("purple", "purple4"), colour = "black") +
+  ylim(0, 20) +
+  geom_text(
+    aes(label = no_orders),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Proposed Site", y = "Order Richness", title = "Total Order Richness") +
+  theme_bw() +
+  theme(axis.title = element_text(size = 15), axis.text.x = element_text(size = 10), plot.title= element_text(size = 15, face = "bold"))
+
+# remove bats from dataset for more informative plot of abundances
+arran_order_abundance_nobats <- arran_order_abundance %>%
+  filter(order != "Chiroptera") # remove any data on bats
+arran_order_abundance_nobats <- arran_order_abundance_nobats %>%
+  mutate(order = as.character(order),
+         site = as.character(site)
+  ) %>%
+  complete(order, site, fill = list(total_count = 0)) # add zeros in for comparison
+# plot abundances
+arran_order_abundance_plot <- ggplot(arran_order_abundance_nobats, aes(x = order, y = total_count, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 82) +
+  geom_text(
+    aes(label = total_count),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Proposed Site", y = "Order Abundances", title = "Total Order Abundance") +
+  scale_fill_manual(values = c("purple", "purple4")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
+
+
+
+# abundance of each class
+arran_class_abundance <- arran_data_full %>%
+  group_by(site, class) %>%
+  summarise(total_count = sum(individualCount), .groups = "drop")
+
+arran_class_abundance <- subset(arran_class_abundance, !is.na(total_count) & class != "")
+
+# class richness
+arran_class_abundance <- arran_class_abundance %>%
+  filter(total_count != 0) # remove any zeros
+arran_class_richness <- arran_class_abundance %>%
+  group_by(site) %>% # Group by site
+  summarise(no_classes = n_distinct(class), .groups = "drop") # Count unique orders
+
+arran_class_richness_plot <- ggplot(arran_class_richness, aes(x = site, y = no_classes)) +
+  geom_bar(stat = "identity", position = "dodge", fill = c("purple", "purple4"), colour = "black") +
+  ylim(0, 8.5) +
+  geom_text(
+    aes(label = no_classes),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Proposed Site", y = "Class Richness", title = "Total Class Richness") +
+  theme_bw() +
+  theme(axis.title = element_text(size = 15), axis.text.x = element_text(size = 10), plot.title= element_text(size = 15, face = "bold"))
+# remove bats from dataset for more informative plot of abundances
+arran_data_nobats <- arran_data_full %>%
+  filter(order != "Chiroptera") # remove any data on bats
+arran_class_abundance <- arran_data_nobats %>%
+  group_by(site, class) %>%
+  summarise(total_count = sum(individualCount), .groups = "drop")
+# remove empty and incomplete rows
+arran_class_abundance <- arran_class_abundance %>%
+  filter(total_count != 0) # remove any zeros
+arran_class_abundance <- arran_class_abundance %>% drop_na()
+# add comparative zeros
+arran_class_abundance <- arran_class_abundance %>%
+  mutate(class = as.character(class),
+         site = as.character(site)
+  ) %>%
+  complete(class, site, fill = list(total_count = 0))
+# plot abundances
+arran_class_abundance_plot <- ggplot(arran_class_abundance, aes(x = class, y = total_count, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge", colour = "black") +
+  ylim(0, 165) +
+  geom_text(
+    aes(label = total_count),
+    position = position_dodge(width = 0.9), # Adjust text position to align with bars
+    vjust = -0.5, # Position text slightly above the bars
+    size = 3      # Adjust text size
+  ) +
+  labs(x = "Proposed Site", y = "Class Abundances", title = "Total Class Abundance") +
+  scale_fill_manual(values = c("purple", "purple4")) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1, size = 10)) +
+  theme(axis.title = element_text(size = 15), plot.title= element_text(size = 15, face = "bold"))
+
+
+# combine plots
+overall_plot <- plot_grid(arran_class_richness_plot, arran_order_richness_plot, arran_class_abundance_plot, arran_order_abundance_plot, labels = "AUTO")
+
+
+
+
 # BETA DIVERSITY
 
 # remove vertebrate presence data, as this cannot be used to calculate diversity
@@ -368,13 +503,12 @@ arran_diversity_indicies <- data.frame(diversity_index = character(0), Slope_A =
 arran_shannons <- data.frame(diversity_index = "shannons", Slope_A = shannons_slopeA, Slope_B = shannons_slopeB)
 arran_simpsons <- data.frame(diversity_index = "simpsons", Slope_A = simpsons_slopeA, Slope_B = simpsons_slopeB)
 arran_diversity_indicies <- rbind(arran_diversity_indicies, arran_shannons, arran_simpsons)
-# Slope A has higher diversity
-
 arran_diversity_indicies$sample <- c("Total Slope Diversity")
 
 
 # repeat for sweep netting only
 invert_sweep_abundances
+# remove empty data
 
 invert_sweep_data_rearranged <- invert_sweep_abundances %>%
   tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
@@ -398,6 +532,7 @@ invert_sweep_diversity_indices <- rbind(invert_sweep_div_indices, invert_sweep_s
 
 # repeat for moth trap only
 invert_moth_abundances
+
 # rearrange data set
 invert_moth_data_rearranged <- invert_moth_abundances %>%
   tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
@@ -420,6 +555,7 @@ invert_moth_diversity_indices <- rbind(invert_moth_div_indices, invert_moth_shan
 
 # repeat for streams only
 invert_stream_abundances
+
 # rearrange data set
 invert_stream_data_rearranged <- invert_stream_abundances %>%
   tidyr::pivot_wider(names_from = order, values_from = total_count, values_fill = 0) %>%
@@ -519,6 +655,9 @@ ggsave("./Figures/vert_abundances_plot.png", width = 30, height = 20, units = "c
 
 vert_richness_plot # species richness obtained from each sample technique on each slope
 ggsave("./Figures/vert_richness_plot.png", width = 30, height = 20, units = "cm")
+
+overall_plot # richness and abundances by class and then by order, for each slope. Abundances calculated with order chiroptera removed as call count was too high in comparison to actual abundances
+ggsave("./Figures/overall_richness_abundance.png", width = 50, height = 30, units = "cm")
 
 total_diversity_plot # diversity indices obtained from each sample technique on each slope 
 ggsave("./Figures/total_diversity_plot.png", width = 25, height = 10, units = "cm")

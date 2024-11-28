@@ -56,9 +56,6 @@ unique(invert_data$order)
 invert_abundances <- invert_data %>%
   group_by(site, order) %>%
   summarise(total_count = sum(individualCount), .groups = "drop")
-# remove empty data
-invert_abundances <- invert_abundances[-1,]
-invert_abundances <- invert_abundances[-1,]
 # add zeros for orders not present on one slope but present on another
 invert_abundances <- invert_abundances %>%
   complete(order, site, fill = list(total_count = 0))
@@ -661,3 +658,4 @@ ggsave("./Figures/overall_richness_abundance.png", width = 50, height = 30, unit
 
 total_diversity_plot # diversity indices obtained from each sample technique on each slope 
 ggsave("./Figures/total_diversity_plot.png", width = 25, height = 10, units = "cm")
+

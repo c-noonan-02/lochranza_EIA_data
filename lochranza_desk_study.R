@@ -54,12 +54,42 @@ NBN_Atlas_data$Invasive <- as.character(NBN_Atlas_data$Invasive)
 # save this data to the project
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/2. EIA Assessment Write-up/lochranza_EIA_data/Data")
 
-# save as 'audiomoth_data_combined.csv'
+# save as 'NBN_atlas_data.csv'
 write.csv(NBN_Atlas_data, "NBN_atlas_data.csv", row.names = F)
 
 
+# rearrange data set
+library(dplyr)
+library(tidyr)
 
+NBN_data <- read.csv("./Data/NBN_atlas_data.csv")
 
+NBN_data_rearranged <- NBN_data %>%
+  # Create a new column classifying the sources into desired categories
+  mutate(Source_Category = case_when(
+    source == "Biodiversity Action Plan UK list of priority species" ~ "Biodiversity Action Plan UK list of priority species",
+    source == "Red List GB post 2001 - Endangered - based on IUCN guidelines" ~ "Red List - Endangered",
+    source == "RSPB Priority Species" ~ "RSPB Priority Species",
+    source == "Scottish Biodiversity List" ~ "Scottish Biodiversity List",
+    source == "Invasive Species" ~ "Invasive Species",
+    source == "Red List GB post 2001 - Critically Endangered (possibly extinct) - based on IUCN guidelines" ~ "Red List - Critically Endangered",
+    TRUE ~ "Other"  # Catch-all for anything unexpected
+  )) %>%
+  # Spread the data so each source category becomes a column
+  pivot_wider(
+    names_from = Source_Category,
+    values_from = Number.of.records,
+    values_fill = 0  # Fill missing values with 0
+  ) %>%
+  # Arrange columns as per your required format
+  select(Species.Name, 
+         "Biodiversity Action Plan UK list of priority species",
+         "Red List - Endangered", 
+         "RSPB Priority Species", 
+         "Scottish Biodiversity List", 
+         "Invasive Species", 
+         "Red List - Critically Endangered",
+         "slope")
 
-
-
+# save as 'NBN_atlas_data_summarised.csv'
+write.csv(NBN_data_rearranged, "./Data/NBN_atlas_data_summarised.csv", row.names = F)

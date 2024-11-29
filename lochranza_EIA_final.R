@@ -163,6 +163,7 @@ invert_stream_abundances <- invert_stream_data %>%
 # add zeros for orders not present on one slope but present on another
 invert_stream_abundances <- invert_stream_abundances %>%
   complete(order, site, fill = list(total_count = 0))
+
 # plot this data
 invert_stream_abundances_plot <- ggplot(invert_stream_abundances, aes(x = order, y = total_count, fill = site)) +
   geom_bar(stat = "identity", position = "dodge", colour = "black") +

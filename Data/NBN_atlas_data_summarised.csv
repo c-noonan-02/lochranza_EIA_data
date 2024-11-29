@@ -1,28 +1,13 @@
-"Species.Name","slope_Biodiversity Action Plan UK list of priority species","slope_Red List - Endangered","slope_RSPB Priority Species","slope_Scottish Biodiversity List","slope_Invasive Species","slope_Red List - Critically Endangered"
-"Acer pseudoplatanus","S","S","S","S","S","S"
-"Anguilla anguilla","S","S","S","S","S","S"
-"Boloria selene","S","S","S","S","S","S"
-"Bufo bufo","S","S","S","S","S","S"
-"Coenonympha pamphilus","S","S","S","S","S","S"
-"Corvus cornix","B","B","B","B","B","B"
-"Cuculus canorus","B","B","B","B","B","B"
-"Cygnus olor","S","S","S","S","S","S"
-"Falco tinnunculus","B","B","B","B","B","B"
-"Gavia immer","N","N","N","N","N","N"
-"Hyacinthoides non-scripta","B","B","B","B","B","B"
-"Larus argentatus","B","B","B","B","B","B"
-"Linaria cannabina","N","N","N","N","N","N"
-"Myotis nattereri","S","S","S","S","S","S"
-"Neovison vison","S","S","S","S","S","S"
-"Numenius arquata","S","S","S","S","S","S"
-"Passer domesticus","B","B","B","B","B","B"
-"Rhododendron ponticum","S","S","S","S","S","S"
-"Rubus spectabilis","S","S","S","S","S","S"
-"Salmo trutta","S","S","S","S","S","S"
-"Sciurus vulgaris","B","B","B","B","B","B"
-"Scoliciosporum umbrinum","S","S","S","S","S","S"
-"Sorbus arranensis","S","S","S","S","S","S"
-"Thalasseus sandvicensis","N","N","N","N","N","N"
-"Turdus philomelos","B","B","B","B","B","B"
-"Turdus torquatus","N","N","N","N","N","N"
-"Tyto alba","S","S","S","S","S","S"
+Species,Vanacular Name,Biodiversity Action Plan UK list of priority species,Red List - Endangered,RSPB Priority Species,Scottish Biodiversity List,Invasive Species,Red List - Critically Endangered
+Corvus cornix,Hooded crow,0,0,0,5,0,0
+Cuculus canorus,Common Cuckoo,9,0,0,9,0,0
+Falco tinnunculus,Common kestrel,0,0,0,5,0,0
+Gavia immer,Common loon,0,0,0,3,0,0
+Hyacinthoides non-scripta,Common Bluebell,0,0,3,0,0,0
+Larus argentatus,European herring gull,0,0,0,5,0,0
+Linaria cannabina,Common linnet,0,0,0,1,0,0
+Passer domesticus,House sparrow,5,0,0,5,0,0
+Sciurus vulgaris,Red Squirrel,4,4,4,4,0,0
+Thalasseus sandvicensis,Sandwich tern,0,0,0,2,0,0
+Turdus philomelos,Song thrush,0,0,0,5,0,0
+Turdus torquatus,Ring ouzel,1,0,0,1,0,0

@@ -1,19 +1,25 @@
+# Code used to check the identifications made in our study against GBIF to detect any
+# outdated terms, or potential errors. 
+
+# NOTE AS I WAS IN CHARGE OF DOING THIS ANALYSIS FOR THE VERTEBRATE DATA COLLECTED USING
+# AUDIOMOTHS AND CAMERA TRAPS, I USED THE CODE THAT CHECKS SPECIES NAMES. FOR DATA ON
+# IVERTEBRATES THE CODE MUST BE ADJUSTED TO CHECK THE ORDER NAMES.
+
 rm(list=ls())
 
 library("rgbif")  
 
+# reset working directory to outside of the project 
 getwd()
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/EIA Assessment Write-up/GBIF")
 
+# import the data that needs to be checked
 vertebrates_messy <- read.csv("vertebrates_tech.csv")
 head(vertebrates_messy)
 
-# table <- data.frame(order=as.character(unique(North_stream_inverts$Order)))
-
-# write.csv(table, 'North_stream_inverts.csv', row.names = F)
-
+# list unique species in the data
 species <- unique(vertebrates_messy$scientificName)
-
+# save the number of species present in the data
 n_species <- length(species)
 
 # Initialize the data frames for a species that is sure to be in the taxonomy
@@ -25,9 +31,6 @@ spp.check.ok <- spp.check.ok[,-which(names(spp.check.ok) %in% c("acceptedUsageKe
 spp.check.bad <- name_backbone("xxx", verbose = TRUE, strict = TRUE)
 spp.check.bad <- spp.check.bad[-1, ]  # Remove this row
 
-
-
-#pb <- txtProgressBar(min = 0, max = n_species, initial = 0, style = 3)
 # Loop over species
 for (i in 1:n_species) {
   # Try-catch block to handle potential errors during each loop
@@ -74,7 +77,7 @@ for (i in 1:n_species) {
 # check if there are any synonyms for any of the species in the data set
 length(which(spp.check.ok$status=="SYNONYM"))
 # check if there are any doubtfull species
-length(which(spp.check.ok$status=="DOUBTFUL")) ##there is no species 
+length(which(spp.check.ok$status=="DOUBTFUL"))
 
 
 

@@ -1,11 +1,11 @@
-rm(list=ls())
-
 # organisation of the raw data on recorded bat calls taken from the audiomoths
 
-# check workingdirectory is correct
+rm(list=ls())
+
+# alter working directory to relavent folders, outside of the repository
 getwd()
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/1. Field Course/audiomoth_bats/Results")
-getwd()
+# check files present
 list.files()
 
 # import each of the audiofiles for audio 2 day 1, into one list
@@ -57,7 +57,6 @@ audio <- list("audio3")
 slope <- list("south")
 coord_lat <- list("55.6984290")
 coord_long <- list("-5.2862850")
-
 
 for (i in file_names)  {
   data <- read.csv(i)

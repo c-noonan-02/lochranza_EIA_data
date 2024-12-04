@@ -1,11 +1,12 @@
 # desk study completed prior to in person habitat assessments and data collection
 
+# set appropriate working directory, outside of repository at the time
 getwd()
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/2. EIA Assessment Write-up/NBN Atlas")
 getwd()
 
 
-# read all the data from NBN Atlas in
+# read all the data downloaded from NBN Atlas in
 north_areareport <- read.delim('proposed_northsite_area_report.txt', sep=",", header = T)
 north_biodiversityactionplan <- read.delim('proposed_northsite_biodiversityactionplan.txt', sep=",", header = T, row.names = NULL)
 north_biodiversityactionplan <- subset(north_biodiversityactionplan, select = -c(row.names))
@@ -51,17 +52,17 @@ NBN_Atlas_data$slope <- as.character(NBN_Atlas_data$slope)
 NBN_Atlas_data$Invasive <- as.character(NBN_Atlas_data$Invasive)
 
 
-# save this data to the project
+# save this data to the project, resetting the working directory first!
 setwd("C:/Users/charl/Documents/University/Year 5 Masters/Semester 1/Professional Skills for Ecologists/2. EIA Assessment Write-up/lochranza_EIA_data/Data")
-
 # save as 'NBN_atlas_data.csv'
 write.csv(NBN_Atlas_data, "NBN_atlas_data.csv", row.names = F)
 
 
-# rearrange data set
+# rearrange data set for easier interpretation
 library(dplyr)
 library(tidyr)
 
+# read back in the dataset / rename the dataset
 NBN_data <- read.csv("./Data/NBN_atlas_data.csv")
 
 NBN_data_rearranged <- NBN_data %>%
@@ -90,42 +91,6 @@ NBN_data_rearranged <- NBN_data %>%
          "Invasive Species", 
          "Red List - Critically Endangered",
          "slope")
-
-# NBN_data_rearranged <- NBN_data_rearranged %>%
-#   # Create a new column to indicate the slope (North = 'N', South = 'S')
-#   mutate(slope2 = case_when(
-#     grepl("North", slope, ignore.case = TRUE) ~ "N",
-#     grepl("South", slope, ignore.case = TRUE) ~ "S",
-#     TRUE ~ NA_character_
-#   )) %>%
-#   # Remove records with missing Slope data
-#   filter(!is.na(slope)) %>%
-#   
-#   # Group by Species and Source Columns and summarize slope presence (N, S, B)
-#   group_by(Species.Name) %>%
-#   summarize(
-#     across(
-#       c("Biodiversity Action Plan UK list of priority species",
-#         "Red List - Endangered", 
-#         "RSPB Priority Species", 
-#         "Scottish Biodiversity List", 
-#         "Invasive Species", 
-#         "Red List - Critically Endangered"),
-#       ~ case_when(
-#         all(slope2 == "N" & !is.na(.)) ~ "N",
-#         all(slope2 == "S" & !is.na(.)) ~ "S",
-#         any(slope2 == "N") & any(slope2 == "S") ~ "B",
-#         TRUE ~ NA_character_
-#       ),
-#       .names = "slope_{.col}"  # Renaming columns with a Slope prefix
-#     ),
-#     Site = paste(unique(slope), collapse = ", ")
-#   ) %>%
-#   ungroup()
-# 
-# # remove the no longer needed 'slope' column
-# NBN_data_rearranged <- NBN_data_rearranged %>%
-#   select(-Site)
 
 # save as 'NBN_atlas_data_summarised.csv'
 write.csv(NBN_data_rearranged, "./Data/NBN_atlas_data_summarised.csv", row.names = F)
